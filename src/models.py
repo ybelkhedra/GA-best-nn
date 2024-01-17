@@ -9,19 +9,21 @@ class FlexibleNN(nn.Module):
         layers = []
         in_size = input_size
 
-        for out_size in hidden_sizes:
-            layers.append(nn.Linear(in_size, out_size))
+        previous_size = input_size
+        for size in hidden_sizes:
+            layers.append(nn.Linear(previous_size, size))
             if use_batch_norm:
-                layers.append(nn.BatchNorm1d(out_size))
+                layers.append(nn.BatchNorm1d(size))
             layers.append(nn.ReLU())
             if dropout_rate > 0.0:
-                layers.append(nn.Dropout(p=dropout_rate))
-            in_size = out_size
+                layers.append(nn.Dropout(dropout_rate))
+            previous_size = size
 
         self.hidden_layers = nn.Sequential(*layers)
-        self.output_layer = nn.Linear(in_size, output_size)
+        self.output_layer = nn.Linear(previous_size, output_size)
 
     def forward(self, x):
+        print(x.shape)
         x = self.hidden_layers(x)
         x = self.output_layer(x)
         return x
