@@ -1,8 +1,8 @@
 import yaml
 import torch
 from torch.utils.data import DataLoader
-from src.data_loader import MNISTDataLoader
-from src.models import SimpleNN
+from src.MNISTDataLoader import MNISTDataLoader
+from src.models import FlexibleNN
 from src.genetic_algorithm import genetic_algorithm
 
 def main(config_path):
@@ -10,16 +10,20 @@ def main(config_path):
         config = yaml.safe_load(config_file)
 
     # Charger les données MNIST
-    train_loader = DataLoader(MNISTDataLoader(train=True), batch_size=config['batch_size'], shuffle=True)
-    val_loader = DataLoader(MNISTDataLoader(train=False), batch_size=config['batch_size'], shuffle=False)
+    train_loader, val_loader = MNISTDataLoader(32, True, 1).load()
 
     # Paramètres du modèle
     input_size = 28 * 28  # Taille de l'image MNIST
-    hidden_size = config['hidden_size']
     output_size = 10  # Nombre de classes pour MNIST
 
     # Définir le modèle initial pour l'algorithme génétique
-    initial_model = SimpleNN(input_size, hidden_size, output_size)
+    initial_model = FlexibleNN(
+        input_size,
+        hidden_sizes=[64, 128],
+        output_size=output_size,
+        dropout_rate=0.2,
+        use_batch_norm=True
+    )
 
     # Exécuter l'algorithme génétique
     best_model = genetic_algorithm(
@@ -28,7 +32,6 @@ def main(config_path):
         config['num_parents'],
         config['mutation_rate'],
         input_size,
-        hidden_size,
         output_size,
         train_loader,
         val_loader,

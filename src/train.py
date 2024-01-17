@@ -2,12 +2,13 @@ import torch
 import torchvision
 
 
-def train(model, trainloader, testloader, criterion, optimizer, epochs):
+def train(model, trainloader, testloader, criterion, optimizer, device, epochs):
     model.train()
     history_loss = []
     for epoch in range(epochs):
         running_loss = 0.0
         for i, (inputs, labels) in enumerate(trainloader, 0):
+            inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
 
             outputs = model(inputs.float())
@@ -25,7 +26,7 @@ def train(model, trainloader, testloader, criterion, optimizer, epochs):
     return history_loss
 
 
-def evalualte_model(model, testloader):
+def evaluate_model(model, testloader):
     model.eval()
     correct = 0
     total = 0

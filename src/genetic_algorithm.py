@@ -24,7 +24,7 @@ def evaluate_population(population, train_loader, val_loader, criterion, device)
         model.to(device)
         # Exemple simple d'entraînement et d'évaluation, adapte-le en fonction de tes besoins
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-        train(model, train_loader, val_loader, criterion, optimizer, epochs=10)
+        train(model, train_loader, val_loader, criterion, optimizer, device, epochs=10)
 
         accuracy = evaluate_model(model, val_loader, device)
         evaluations.append((model, accuracy))
@@ -64,8 +64,8 @@ def mutate(child, mutation_rate):
 
     return mutated_child
 
-def genetic_algorithm(population_size, num_generations, num_parents, mutation_rate, input_size, hidden_size, output_size, train_loader, val_loader, criterion, device):
-    population = initialize_population(population_size, input_size, hidden_size, output_size)
+def genetic_algorithm(population_size, num_generations, num_parents, mutation_rate, input_size, output_size, train_loader, val_loader, criterion, device):
+    population = initialize_population(population_size, input_size, output_size)
 
     for generation in range(num_generations):
         evaluations = evaluate_population(population, train_loader, val_loader, criterion, device)
