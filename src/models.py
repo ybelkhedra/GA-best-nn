@@ -6,6 +6,14 @@ class FlexibleNN(nn.Module):
     def __init__(self, input_size, hidden_sizes, output_size, dropout_rate=0.0, use_batch_norm=False):
         super(FlexibleNN, self).__init__()
 
+        self.input_size = input_size
+        self.hidden_sizes = hidden_sizes
+        self.output_size = output_size
+        self.dropout_rate = dropout_rate
+        self.use_batch_norm = use_batch_norm
+
+        self.flatten = nn.Flatten(start_dim=1)
+
         layers = []
         in_size = input_size
 
@@ -23,7 +31,7 @@ class FlexibleNN(nn.Module):
         self.output_layer = nn.Linear(previous_size, output_size)
 
     def forward(self, x):
-        print(x.shape)
+        x = self.flatten(x)
         x = self.hidden_layers(x)
         x = self.output_layer(x)
         return x

@@ -1,6 +1,6 @@
 batch_size: 64
 hidden_size: 128
-population_size: 10
+population_size: 5
 num_generations: 5
-num_parents: 4
+num_parents: 3
 mutation_rate: 0.1

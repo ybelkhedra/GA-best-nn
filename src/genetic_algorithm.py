@@ -9,7 +9,7 @@ import random
 def initialize_population(population_size, input_size, output_size):
     population = []
     for _ in range(population_size):
-        # Exemple avec différentes valeurs d'hyperparamètres
+
         hidden_sizes = [random.choice([64, 128, 256]) for _ in range(random.randint(1, 3))]
         dropout_rate = random.uniform(0.0, 0.5)
         use_batch_norm = random.choice([True, False])
@@ -22,9 +22,9 @@ def evaluate_population(population, train_loader, val_loader, criterion, device)
     evaluations = []
     for model in population:
         model.to(device)
-        # Exemple simple d'entraînement et d'évaluation, adapte-le en fonction de tes besoins
+
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-        train(model, train_loader, val_loader, criterion, optimizer, device, epochs=10)
+        train(model, train_loader, val_loader, criterion, optimizer, device, epochs=5)
 
         accuracy = evaluate_model(model, val_loader, device)
         evaluations.append((model, accuracy))
@@ -37,7 +37,6 @@ def select_parents(evaluations, num_parents):
     return parents
 
 def crossover(parent1, parent2):
-    # Crossover des hyperparamètres
     hidden_sizes_child = []
     for size1, size2 in zip(parent1.hidden_sizes, parent2.hidden_sizes):
         hidden_sizes_child.append(random.choice([size1, size2]))
@@ -49,19 +48,21 @@ def crossover(parent1, parent2):
     return child
 
 def mutate(child, mutation_rate):
-    # Mutation des hyperparamètres
-    mutated_child = child.clone()
 
-    for i in range(len(mutated_child.hidden_sizes)):
+    hidden_sizes_mutated = child.hidden_sizes.copy()
+    for i in range(len(child.hidden_sizes)):
         if random.random() < mutation_rate:
-            mutated_child.hidden_sizes[i] = random.choice([64, 128, 256])
+            hidden_sizes_mutated[i] = random.choice([64, 128, 256])
 
+    dropout_rate_mutated = child.dropout_rate
     if random.random() < mutation_rate:
-        mutated_child.dropout_rate = random.uniform(0.0, 0.5)
+        dropout_rate_mutated = random.uniform(0.0, 0.5)
 
+    use_batch_norm_mutated = child.use_batch_norm
     if random.random() < mutation_rate:
-        mutated_child.use_batch_norm = not mutated_child.use_batch_norm
+        use_batch_norm_mutated = not child.use_batch_norm
 
+    mutated_child = FlexibleNN(child.input_size, hidden_sizes_mutated, child.output_size, dropout_rate_mutated, use_batch_norm_mutated)
     return mutated_child
 
 def genetic_algorithm(population_size, num_generations, num_parents, mutation_rate, input_size, output_size, train_loader, val_loader, criterion, device):
