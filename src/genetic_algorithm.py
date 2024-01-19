@@ -20,14 +20,17 @@ def initialize_population(population_size, input_size, output_size):
 
 def evaluate_population(population, train_loader, val_loader, criterion, device):
     evaluations = []
+    p = 1
     for model in population:
+        print("Evaluating model %d/%d" % (p, len(population)))
         model.to(device)
 
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-        train(model, train_loader, val_loader, criterion, optimizer, device, epochs=5)
+        train(model, train_loader, val_loader, criterion, optimizer, device, epochs=2)
 
         accuracy = evaluate_model(model, val_loader, device)
         evaluations.append((model, accuracy))
+        p += 1
 
     return evaluations
 
@@ -69,7 +72,13 @@ def genetic_algorithm(population_size, num_generations, num_parents, mutation_ra
     population = initialize_population(population_size, input_size, output_size)
 
     for generation in range(num_generations):
+        print("Generation %d" % generation)
         evaluations = evaluate_population(population, train_loader, val_loader, criterion, device)
+
+        print("Ranking of the models in generation %d:" % generation)
+        for i, (model, accuracy) in enumerate(sorted(evaluations, key=lambda x: x[1], reverse=True)):
+            print("Model %d: Accuracy %.4f" % (i, accuracy))
+
         parents = select_parents(evaluations, num_parents)
 
         new_population = parents.copy()
@@ -83,5 +92,9 @@ def genetic_algorithm(population_size, num_generations, num_parents, mutation_ra
 
         population = new_population
 
-    best_model, _ = max(evaluations, key=lambda x: x[1])
+    best_model, accuracy = max(evaluations, key=lambda x: x[1])
+
+    print("Best model accuracy: %.4f" % accuracy)
+    print("Best model info:")
+    print(best_model.get_info())
     return best_model

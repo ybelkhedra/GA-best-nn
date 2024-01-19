@@ -35,3 +35,13 @@ class FlexibleNN(nn.Module):
         x = self.hidden_layers(x)
         x = self.output_layer(x)
         return x
+    
+
+    def get_info(self):
+        return {
+            'input_size': self.input_size,
+            'hidden_sizes': self.hidden_sizes,
+            'output_size': self.output_size,
+            'dropout_rate': self.dropout_rate,
+            'use_batch_norm': self.use_batch_norm
+        }
