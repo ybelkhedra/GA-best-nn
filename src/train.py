@@ -1,5 +1,4 @@
 import torch
-import torchvision
 
 
 def train(model, trainloader, testloader, criterion, optimizer, device, epochs):
